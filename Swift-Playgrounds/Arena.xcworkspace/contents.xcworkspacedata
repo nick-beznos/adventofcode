@@ -2,7 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/beznosn/DEV/adventofcode/Arena-Playground/day3.playground">
+      location = "group:day2.playground">
+   </FileRef>
+   <FileRef
+      location = "group:day3.playground">
    </FileRef>
    <FileRef
       location = "group:Dependencies">
