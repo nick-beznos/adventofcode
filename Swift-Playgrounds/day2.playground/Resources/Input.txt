@@ -1,6 +1,3 @@
-import Foundation
-
-public let input = """
 A Y
 B X
 B X
@@ -2501,4 +2498,3 @@ C Y
 C Y
 B X
 B X
-"""

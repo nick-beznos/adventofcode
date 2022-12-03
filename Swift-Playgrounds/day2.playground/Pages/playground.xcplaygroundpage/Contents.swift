@@ -147,6 +147,9 @@ func parseInputForFirstTask(_ input: String) throws -> [(Shape, Shape)] {
     }
 }
 
+let fileURL = Bundle.main.url(forResource: "Input", withExtension: "txt")
+let input = try String(contentsOf: fileURL!, encoding: String.Encoding.utf8)
+
 func firstTask() {
     do {
         let strategyGuide = try parseInputForFirstTask(input)
