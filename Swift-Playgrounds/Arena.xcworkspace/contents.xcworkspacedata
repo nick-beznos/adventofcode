@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:day10.playground">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/beznosn/DEV/adventofcode/Swift-Playgrounds/day9.playground">
+   </FileRef>
+   <FileRef
       location = "group:day8.playground">
    </FileRef>
    <FileRef
