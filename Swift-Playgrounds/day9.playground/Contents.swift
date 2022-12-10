@@ -1,9 +1,9 @@
 import Foundation
 import RegexBuilder
 
-let inputURL = Bundle.main.url(forResource: "Input", withExtension: nil)
+let inputURL = Bundle.main.url(forResource: "Input", withExtension: "txt")
 let input = try String(contentsOf: inputURL!, encoding: String.Encoding.utf8)
-let testURL = Bundle.main.url(forResource: "test", withExtension: nil)
+let testURL = Bundle.main.url(forResource: "test", withExtension: "txt")
 let test = try String(contentsOf: testURL!, encoding: String.Encoding.utf8)
 
 enum Direction {

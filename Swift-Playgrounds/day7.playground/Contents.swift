@@ -1,7 +1,7 @@
 import Foundation
 import RegexBuilder
 
-let fileURL = Bundle.main.url(forResource: "Input", withExtension: nil)
+let fileURL = Bundle.main.url(forResource: "Input", withExtension: "txt")
 let input = try String(contentsOf: fileURL!, encoding: String.Encoding.utf8)
 
 enum Line {

@@ -1,6 +1,6 @@
 import Foundation
 
-let fileURL = Bundle.main.url(forResource: "Input", withExtension: nil)
+let fileURL = Bundle.main.url(forResource: "Input", withExtension: "txt")
 let input = try String(contentsOf: fileURL!, encoding: String.Encoding.utf8)
 
 let grid = input.split(whereSeparator: \.isNewline).map({ $0.map({ Int("\($0)")! }) })
