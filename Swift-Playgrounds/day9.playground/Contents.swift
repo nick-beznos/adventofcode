@@ -24,14 +24,7 @@ struct Coordinate: Hashable {
     var lastDirection: Direction?
 
     func isCloseTo(_ coordinate: Coordinate) -> Bool {
-        var coordinatesInRadius = [Coordinate]()
-        for ix in [-1, 0, 1] {
-            for iy in [-1, 0, 1] {
-                coordinatesInRadius.append(Coordinate(x: x + ix, y: y + iy))
-            }
-        }
-
-        return coordinatesInRadius.contains(where: { $0 == coordinate})
+        return abs(self.x - coordinate.x) <= 1 && abs(self.y - coordinate.y) <= 1
     }
 }
 
@@ -61,9 +54,8 @@ func parse(_ stringInput: String) -> [Command] {
 }
 
 
-func move(head: Coordinate, tail: Coordinate, direction: Direction) -> (Coordinate, Coordinate) {
+func moveHead(_ head: Coordinate, direction: Direction) -> Coordinate {
     var newHead: Coordinate
-    var newTail: Coordinate
 
     switch direction {
     case .left:
@@ -76,20 +68,20 @@ func move(head: Coordinate, tail: Coordinate, direction: Direction) -> (Coordina
         newHead = Coordinate(x: head.x, y: head.y + 1)
     }
 
-//    print("\(newHead.x) \(newHead.y)")
-
-    newTail = simulateNewTailPosition(tail: tail, head: head, newHead: newHead)
-
-    return (newHead, newTail)
+    return newHead
 }
 
-func simulateNewTailPosition(tail: Coordinate, head: Coordinate, newHead: Coordinate) -> Coordinate {
-    guard newHead != tail else { return tail }
-    if tail.isCloseTo(newHead) {
-        return tail
-    } else {
-        return head
+func updateTailPosition(_ tail: Coordinate, head: Coordinate) -> Coordinate {
+    if head.x == tail.x {
+        return Coordinate(x: head.x, y: tail.y + (head.y > tail.y ? 1 : -1))
     }
+
+    if head.y == tail.y {
+        return Coordinate(x: tail.x + (head.x > tail.x ? 1 : -1), y: head.y)
+    }
+
+    //Diagonal move
+    return Coordinate(x: tail.x + (head.x > tail.x ? 1 : -1), y: tail.y + (head.y > tail.y ? 1 : -1))
 }
 
 
@@ -99,11 +91,9 @@ func task1() {
     var uniqueTailCoordinates = Set<Coordinate>()
 
     for command in commands {
-//        print("\(command.dir) \(command.steps)")
         for _ in 1...command.steps {
-            let move = move(head: head, tail: tail, direction: command.dir)
-            head = move.0
-            tail = move.1
+            head = moveHead(head, direction: command.dir)
+            tail = updateTailPosition(tail, head: head)
 
             uniqueTailCoordinates.insert(tail)
         }
@@ -112,29 +102,27 @@ func task1() {
     print(uniqueTailCoordinates.count)
 }
 
-func task2() {
-    var knots = Array(repeating: Coordinate(x: 0, y: 0), count: 10)
+func task2() async {
+    var knots = Array(repeating: Coordinate(x: 11, y: 15), count: 10)
     var uniqueTailCoordinates = Set<Coordinate>()
 
     for command in commands {
-//        print("\(command.dir) \(command.steps)")
         for _ in 1...command.steps {
             for (index, knot) in knots.enumerated() {
-                guard index + 1 != knots.count else { continue }
-                let tail = knots[index + 1]
-                let move = move(head: knot, tail: tail, direction: knot.lastDirection ?? command.dir)
+                let isHead = index == 0
 
-                var updatedHead = move.0
-                var updatedTail = move.1
-                updatedHead.lastDirection = command.dir
-
-                if tail != updatedTail {
-                    updatedTail.lastDirection = knot.lastDirection
+                if isHead {
+                    let newHead = moveHead(knot, direction: command.dir)
+                    knots[0] = newHead
+                } else {
+                    if !knot.isCloseTo(knots[index - 1]) {
+                        let updatedKnot = updateTailPosition(knot, head: knots[index - 1])
+                        knots[index] = updatedKnot
+                    }
                 }
-
-                knots[index + 1] = updatedHead
-                knots[index] = updatedTail
             }
+
+//            await visualize(knots)
 
             uniqueTailCoordinates.insert(knots.last!)
         }
@@ -143,19 +131,36 @@ func task2() {
     print(uniqueTailCoordinates.count)
 }
 
+func visualize(_ knots: [Coordinate]) async {
+    //26x21
+    var board = Array(repeating: Array(repeating: ".", count: 26), count: 21)
+
+
+    for (index, knot) in knots.enumerated() {
+        let char = index == 0 ? "H" : "\(index)"
+        if board[knot.y][knot.x] == "." {
+            board[knot.y][knot.x] = char
+        }
+    }
+
+    print("\n")
+    print(board.map({ $0.joined() }).joined(separator: "\n"))
+    try! await Task.sleep(nanoseconds: UInt64(Double(NSEC_PER_SEC) * 0.1))
+
+}
+
 let commands: [Command] = parse(test)
 //task1()
+
 func evaluateFunc(_ code: () -> ()) {
     let start = DispatchTime.now()
     code()
     let finish = DispatchTime.now()
 
     let nanoTime = finish.uptimeNanoseconds - start.uptimeNanoseconds
-    let timeInterval = Double(nanoTime) / 1_000_000_000
+    let timeInterval = Double(nanoTime) / Double(NSEC_PER_SEC)
     print("It took \(timeInterval) seconds to run this __chocolate_ice_cream_emoji__")
 }
 
-evaluateFunc {
-    task2()
-}
+await task2()
 
