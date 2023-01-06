@@ -37,7 +37,7 @@ let regex = Regex {
 func parse(_ stringInput: String) -> [Command] {
     var result: [Command] = []
 
-    stringInput.split(whereSeparator: \.isNewline).map { line in
+    stringInput.split(whereSeparator: \.isNewline).forEach { line in
         if let match = line.wholeMatch(of: regex) {
             switch String(match.1) {
             case "L": result.append(Command(dir: .left, steps: Int(match.2) ?? 0))
